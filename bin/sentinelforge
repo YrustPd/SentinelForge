@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+# SPDX-License-Identifier: AGPL-3.0-only
+set -Eeuo pipefail
+IFS=$'\n\t'
+
+SCRIPT_PATH="${BASH_SOURCE[0]}"
+SCRIPT_DIR="$(cd "$(dirname "${SCRIPT_PATH}")" && pwd)"
+PROJECT_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
+
+if [[ -f "${PROJECT_ROOT}/src/bootstrap.sh" ]]; then
+  SENTINELFORGE_APP_ROOT="$PROJECT_ROOT"
+else
+  SENTINELFORGE_APP_ROOT="/usr/local/share/sentinelforge"
+  if [[ ! -f "${SENTINELFORGE_APP_ROOT}/src/bootstrap.sh" ]]; then
+    printf 'SentinelForge: unable to locate modules. Reinstall using scripts/install.sh.\n' >&2
+    exit 1
+  fi
+fi
+
+export SENTINELFORGE_APP_ROOT
+
+# shellcheck disable=SC1090
+source "${SENTINELFORGE_APP_ROOT}/src/bootstrap.sh"
+
+SentinelForge::main "$@"
